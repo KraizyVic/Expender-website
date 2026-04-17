@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Expender — M-Pesa Expense Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --brand:         #A7EBF2;
+      --brand-dim:     #6dd4de;
+      --brand-glow:    rgba(167,235,242,0.10);
+      --brand-border:  rgba(167,235,242,0.22);
+      --bg:            #0c0c0c;
+      --surface:       #141414;
+      --surface2:      #1d1d1d;
+      --border:        #252525;
+      --text:          #f0f0f0;
+      --muted:         #666;
+      --muted2:        #999;
+      --green-light:   #4caf72;
+      --pink:          #e91e7a;
+      --purple:        #9b59b6;
+      --radius:        10px;
+      --radius-lg:     16px;
+      --radius-pill:   100px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Sora', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(12,12,12,0.88); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 40px; height: 58px;
+    }
+    .nav-logo { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.5px; color: var(--text); text-decoration: none; }
+    .nav-logo span { color: var(--brand); }
+    .nav-tabs { display: flex; gap: 2px; list-style: none; }
+    .nav-tabs a {
+      text-decoration: none; font-size: 0.82rem; font-weight: 500;
+      color: var(--muted); padding: 7px 14px; border-radius: var(--radius);
+      transition: all 0.16s; display: block;
+    }
+    .nav-tabs a:hover { color: var(--text); background: var(--surface2); }
+    .nav-tabs a.active { color: var(--brand); background: var(--brand-glow); }
+
+    /* PAGES */
+    .page { display: none; }
+    .page.active { display: block; animation: fadeUp 0.2s ease; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(7px); } to { opacity:1; transform:none; } }
+
+    /* HERO */
+    .hero {
+      max-width: 1080px; margin: 0 auto;
+      padding: 68px 40px 44px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--brand-glow); border: 1px solid var(--brand-border);
+      color: var(--brand); font-size: 0.7rem; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 5px 12px; border-radius: var(--radius-pill); margin-bottom: 22px;
+    }
+    .hero-badge::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--brand); box-shadow: 0 0 6px var(--brand);
+      animation: blink 2s infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .hero h1 { font-size: clamp(2.1rem, 4vw, 3.3rem); font-weight: 800; line-height: 1.1; letter-spacing: -1px; margin-bottom: 18px; }
+    .hero h1 em { font-style: normal; color: var(--brand); }
+    .hero-sub { font-size: 0.94rem; color: var(--muted2); line-height: 1.72; font-weight: 300; margin-bottom: 32px; max-width: 400px; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 9px;
+      background: var(--brand); color: #0c0c0c;
+      font-family: 'Sora', sans-serif; font-weight: 700; font-size: 0.86rem;
+      padding: 12px 22px; border-radius: var(--radius); border: none;
+      text-decoration: none; cursor: pointer;
+      transition: all 0.16s;
+    }
+    .btn-primary:hover { background: var(--brand-dim); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(167,235,242,0.18); }
+    .btn-primary svg { transition: transform 0.16s; }
+    .android-note {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-size: 0.74rem; color: var(--muted); margin-top: 14px;
+    }
+
+    /* PHONES */
+    .hero-right { display: flex; gap: 12px; justify-content: center; align-items: flex-end; }
+    .phone-col { display: flex; flex-direction: column; gap: 12px; }
+    .phone-col.offset { padding-top: 48px; }
+    .phone-slot {
+      width: 146px; background: var(--surface);
+      border: 1.5px solid var(--border); border-radius: 22px;
+      overflow: hidden; flex-shrink: 0;
+    }
+    .phone-slot.h1 { height: 310px; }
+    .phone-slot.h2 { height: 210px; }
+    .phone-slot.h3 { height: 270px; }
+    .phone-slot.h4 { height: 250px; }
+    .phone-slot img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
+    .phone-placeholder {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 8px; color: var(--muted); font-size: 0.72rem; text-align: center; padding: 12px;
+    }
+
+    /* MPESA CALLOUT */
+    .mpesa-strip { max-width: 1080px; margin: 0 auto; padding: 0 40px 56px; }
+    .mpesa-card {
+      background: var(--surface); border: 1px solid var(--brand-border);
+      border-radius: var(--radius-lg); padding: 36px 44px;
+      display: grid; grid-template-columns: auto 1fr; gap: 28px; align-items: center;
+    }
+    .mpesa-icon {
+      width: 66px; height: 66px;
+      background: var(--brand-glow); border: 1px solid var(--brand-border);
+      border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center;
+      color: var(--brand); flex-shrink: 0;
+    }
+    .mpesa-card h2 { font-size: 1.3rem; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 8px; }
+    .mpesa-card h2 span { color: var(--brand); }
+    .mpesa-card p { font-size: 0.88rem; color: var(--muted2); line-height: 1.68; font-weight: 300; }
+
+    /* CHIPS */
+    .chips-section { max-width: 1080px; margin: 0 auto; padding: 48px 40px; }
+    .chips-label { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 18px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 9px; }
+    .chip { display: inline-flex; align-items: center; gap: 7px; padding: 7px 14px; border-radius: var(--radius); font-size: 0.8rem; font-weight: 500; }
+    .chip-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .chip.groceries { background: rgba(58,125,85,0.18); color: #4caf72; }
+    .chip.groceries .chip-dot { background: #4caf72; }
+    .chip.food      { background: rgba(233,30,122,0.14); color: var(--pink); }
+    .chip.food .chip-dot { background: var(--pink); }
+    .chip.shopping  { background: rgba(155,89,182,0.16); color: var(--purple); }
+    .chip.shopping .chip-dot { background: var(--purple); }
+    .chip.loans     { background: rgba(167,235,242,0.09); color: var(--brand); }
+    .chip.loans .chip-dot { background: var(--brand); }
+    .chip.savings   { background: rgba(100,160,240,0.13); color: #7eaef0; }
+    .chip.savings .chip-dot { background: #7eaef0; }
+    .chip.drinks    { background: rgba(255,165,0,0.11); color: #ffb347; }
+    .chip.drinks .chip-dot { background: #ffb347; }
+    .chip.custom    { background: var(--surface2); color: var(--muted2); border: 1px dashed var(--border); }
+
+    /* FEATURES */
+    .features-section { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 68px 40px; }
+    .features-inner { max-width: 1080px; margin: 0 auto; }
+    .section-eyebrow { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brand); margin-bottom: 36px; }
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1px; }
+    .feat { background: var(--bg); padding: 30px 26px; border: 1px solid var(--border); }
+    .features-grid .feat:first-child { border-radius: var(--radius) 0 0 var(--radius); }
+    .features-grid .feat:last-child  { border-radius: 0 var(--radius) var(--radius) 0; }
+    .feat-icon {
+      width: 36px; height: 36px;
+      background: var(--brand-glow); border: 1px solid var(--brand-border);
+      border-radius: var(--radius); display: flex; align-items: center; justify-content: center;
+      color: var(--brand); margin-bottom: 16px;
+    }
+    .feat h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 8px; }
+    .feat p { font-size: 0.82rem; color: var(--muted2); line-height: 1.62; font-weight: 300; }
+
+    /* FOOTER */
+    footer { border-top: 1px solid var(--border); padding: 28px 40px; display: flex; align-items: center; justify-content: space-between; max-width: 1080px; margin: 0 auto; }
+    footer p { font-size: 0.76rem; color: var(--muted); }
+    .footer-links { display: flex; gap: 20px; }
+    .footer-links a { font-size: 0.76rem; color: var(--muted); text-decoration: none; cursor: pointer; transition: color 0.14s; }
+    .footer-links a:hover { color: var(--brand); }
+
+    /* LEGAL */
+    .legal-wrap { max-width: 660px; margin: 0 auto; padding: 60px 40px; }
+    .legal-badge { display: inline-block; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--brand); background: var(--brand-glow); border: 1px solid var(--brand-border); padding: 4px 10px; border-radius: var(--radius-pill); margin-bottom: 16px; }
+    .legal-wrap h1 { font-size: 1.9rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 5px; }
+    .legal-meta { font-size: 0.78rem; color: var(--muted); margin-bottom: 36px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+    .legal-wrap h2 { font-size: 1rem; font-weight: 700; margin: 28px 0 9px; color: var(--brand); }
+    .legal-wrap p, .legal-wrap li { font-size: 0.86rem; color: var(--muted2); line-height: 1.76; font-weight: 300; }
+    .legal-wrap ul { padding-left: 18px; margin: 9px 0; }
+    .legal-wrap li { margin-bottom: 4px; }
+    .legal-wrap strong { color: var(--text); font-weight: 500; }
+
+    /* CONFIRM */
+    .confirm-page { min-height: calc(100vh - 58px); display: flex; align-items: center; justify-content: center; padding: 40px; }
+    .confirm-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 52px 44px; text-align: center; max-width: 420px; width: 100%; }
+    .confirm-tick { width: 58px; height: 58px; border-radius: 50%; background: rgba(76,175,114,0.14); border: 1px solid rgba(76,175,114,0.28); display: flex; align-items: center; justify-content: center; margin: 0 auto 22px; color: #4caf72; }
+    .confirm-card h1 { font-size: 1.7rem; font-weight: 800; letter-spacing: -0.4px; margin-bottom: 11px; }
+    .confirm-card p { font-size: 0.88rem; color: var(--muted2); line-height: 1.65; font-weight: 300; margin-bottom: 30px; }
+
+    /* RESPONSIVE */
+    @media (max-width: 760px) {
+      nav { padding: 0 18px; }
+      .hero { grid-template-columns: 1fr; padding: 44px 18px 28px; }
+      .hero-right { overflow-x: auto; justify-content: flex-start; padding-bottom: 8px; }
+      .mpesa-strip { padding: 0 18px 44px; }
+      .mpesa-card { grid-template-columns: 1fr; padding: 24px 20px; }
+      .chips-section, .legal-wrap { padding-left: 18px; padding-right: 18px; }
+      .features-section { padding: 52px 18px; }
+      .features-grid .feat:first-child { border-radius: var(--radius) var(--radius) 0 0; }
+      .features-grid .feat:last-child  { border-radius: 0 0 var(--radius) var(--radius); }
+      footer { padding: 24px 18px; flex-direction: column; gap: 14px; text-align: center; }
+      .confirm-card { padding: 36px 22px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="#" onclick="showPage('home');return false;">Exp<span>ender</span></a>
+  <ul class="nav-tabs">
+    <li><a href="#" onclick="showPage('home');return false;"    id="tab-home"    class="active">Home</a></li>
+    <li><a href="#" onclick="showPage('privacy');return false;" id="tab-privacy">Privacy</a></li>
+    <li><a href="#" onclick="showPage('terms');return false;"   id="tab-terms">Terms</a></li>
+  </ul>
+</nav>
+
+
+<!-- HOME -->
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-left">
+      <div class="hero-badge">Android App &middot; Free</div>
+      <h1>Track M-Pesa.<br>Understand your<br><em>spending.</em></h1>
+      <p class="hero-sub">Expender scans your M-Pesa messages automatically, sorts every transaction into your custom categories, and gives you clear analytics — zero manual entry.</p>
+      <a href="#" class="btn-primary">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.7 9.05 7.4c1.39.07 2.34.74 3.15.8 1.19-.24 2.35-.93 3.62-.84 1.53.14 2.68.73 3.43 1.82-3.16 1.88-2.55 5.97.38 7.1-.5 1.33-1.16 2.62-2.58 4zm-3.06-17.02c.07 1.93-1.76 3.52-3.61 3.37-.2-1.78 1.56-3.5 3.61-3.37z"/></svg>
+        Download on Android
+      </a>
+      <div class="android-note">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="#3ddc84"><path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24a10.15 10.15 0 0 0-8.94 0L5.65 5.67c-.19-.29-.54-.37-.83-.22-.3.16-.42.54-.26.85L6.4 9.48A9.8 9.8 0 0 0 2 17h20a9.8 9.8 0 0 0-4.4-7.52zM7 14.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm10 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/></svg>
+        Android only — iOS restricts SMS access
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="phone-col">
+        <div class="phone-slot h1">
+          <img src="Screenshot_2026-04-17-14-21-27-10_7b3c47240948aa7ced679e5a58a40e20.jpg" alt="Home screen" />
+        </div>
+        <div class="phone-slot h2">
+          <img src="Screenshot_2026-04-17-15-28-21-56_7b3c47240948aa7ced679e5a58a40e20.jpg" alt="Category view" />
+        </div>
+      </div>
+      <div class="phone-col offset">
+        <div class="phone-slot h3">
+          <img src="Screenshot_2026-04-17-14-30-24-42_7b3c47240948aa7ced679e5a58a40e20.jpg" alt="Analytics" />
+        </div>
+        <div class="phone-slot h4">
+          <img src="1776429284232.jpg" alt="Transactions" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mpesa-strip">
+    <div class="mpesa-card">
+      <div class="mpesa-icon">
+        <svg width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+      </div>
+      <div>
+        <h2><span>M-Pesa</span> scanning — the core of Expender.</h2>
+        <p>On launch, Expender silently reads your SMS inbox and parses every M-Pesa message — TILL payments, Send Money, Fuliza, Pochi la Biashara, and more. Transactions are instantly matched to your categories and reflected in analytics. No bank integrations, no manual input, no friction.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="chips-section">
+    <div class="chips-label">Built-in categories &middot; fully customisable</div>
+    <div class="chips">
+      <span class="chip groceries"><span class="chip-dot"></span>Groceries</span>
+      <span class="chip food"><span class="chip-dot"></span>Food</span>
+      <span class="chip shopping"><span class="chip-dot"></span>Shopping</span>
+      <span class="chip loans"><span class="chip-dot"></span>Loans</span>
+      <span class="chip savings"><span class="chip-dot"></span>Savings</span>
+      <span class="chip drinks"><span class="chip-dot"></span>Drinks</span>
+      <span class="chip custom">+ Add your own</span>
+    </div>
+  </div>
+
+  <div class="features-section">
+    <div class="features-inner">
+      <div class="section-eyebrow">What Expender does</div>
+      <div class="features-grid">
+        <div class="feat">
+          <div class="feat-icon">
+            <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <h3>Auto SMS Scan</h3>
+          <p>Reads your M-Pesa inbox on every launch. TILL, Send Money, Fuliza, and Pochi — all captured without lifting a finger.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-icon">
+            <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          </div>
+          <h3>Keyword Categories</h3>
+          <p>Define keyword rules and Expender routes each transaction to the right category automatically — fully customisable.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-icon">
+            <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <h3>Spending Analytics</h3>
+          <p>Monthly donut charts, per-category breakdowns, and income vs. expense summaries updated in real time.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-icon">
+            <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <h3>Private &amp; Offline</h3>
+          <p>Everything stays on your device. No cloud, no account required. Your financial data belongs to you.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2025 Expender. Android only.</p>
+    <div class="footer-links">
+      <a onclick="showPage('privacy')">Privacy Policy</a>
+      <a onclick="showPage('terms')">Terms of Use</a>
+    </div>
+  </footer>
+</section>
+
+
+<!-- PRIVACY -->
+<section class="page" id="page-privacy">
+  <div class="legal-wrap">
+    <div class="legal-badge">Legal</div>
+    <h1>Privacy Policy</h1>
+    <p class="legal-meta">Last updated: January 1, 2025</p>
+    <p>Expender is committed to your privacy. This policy explains what data the app accesses, why, and how it is handled.</p>
+    <h2>1. SMS Access</h2>
+    <p>Expender requests permission to read your SMS inbox solely to parse M-Pesa transaction messages. This data is processed <strong>locally on your device</strong> and is never transmitted to any server, third party, or cloud service.</p>
+    <h2>2. Data We Collect</h2>
+    <ul>
+      <li><strong>Parsed transaction data</strong> — amounts, dates, recipient names, and transaction types extracted from M-Pesa messages.</li>
+      <li><strong>Category rules</strong> — keywords you define yourself.</li>
+      <li><strong>App preferences</strong> — settings and customisations stored locally.</li>
+      <li><strong>User account</strong> — user account and subscriptions stored online and a local copy. </li>
+    </ul>
+    <p>We do <strong>not</strong> collect your location, contacts, or any other information.</p>
+    <h2>3. Data Storage</h2>
+    <p>All data is stored locally in your device's private app storage. Uninstalling the app permanently deletes all stored data. We do not operate any analytics pipeline.</p>
+    <h2>4. No Third-Party Sharing</h2>
+    <p>We do not sell, share, or transmit your data to any third party — including advertisers, analytics providers, or data brokers.</p>
+    <h2>5. Permissions Used</h2>
+    <ul>
+      <li><strong>READ_SMS</strong> — to scan M-Pesa messages. Required for core functionality.</li>
+    </ul>
+    <p>No other permissions are requested.</p>
+    <h2>6. Children's Privacy</h2>
+    <p>Expender is not directed at children under 18 and we do not knowingly collect data from minors.</p>
+    <h2>7. Changes</h2>
+    <p>We may update this Privacy Policy. Changes will be noted with a revised "Last updated" date. Continued use constitutes acceptance.</p>
+    <h2>8. Contact</h2>
+    <p>Privacy questions: <strong>privacy@expender.app</strong></p>
+  </div>
+</section>
+
+
+<!-- TERMS -->
+<section class="page" id="page-terms">
+  <div class="legal-wrap">
+    <div class="legal-badge">Legal</div>
+    <h1>Terms &amp; Conditions</h1>
+    <p class="legal-meta">Last updated: January 1, 2025</p>
+    <p>By downloading or using Expender, you agree to these Terms.</p>
+    <h2>1. Eligibility</h2>
+    <p>You must be at least 13 years old to use Expender.</p>
+    <h2>2. License</h2>
+    <p>We grant you a personal, non-exclusive, non-transferable, revocable licence to use Expender for personal, non-commercial purposes. You may not copy, modify, reverse-engineer, or redistribute any part of the app.</p>
+    <h2>3. SMS Permission</h2>
+    <p>By granting SMS read permission, you acknowledge that Expender will access M-Pesa messages on your device solely for transaction parsing. You may revoke this permission at any time via Android settings, though doing so disables core functionality.</p>
+    <h2>4. User Responsibilities</h2>
+    <ul>
+      <li>You are responsible for the accuracy of any manually entered data.</li>
+      <li>You agree not to use the app for any unlawful purpose.</li>
+      <li>You must not attempt to tamper with or reverse-engineer the app.</li>
+    </ul>
+    <h2>5. Financial Disclaimer</h2>
+    <p>Expender is a personal tracking tool only. It does not constitute financial, tax, or investment advice.</p>
+    <h2>6. Third-Party Services</h2>
+    <p>Expender is not affiliated with, endorsed by, or a product of Safaricom PLC or M-Pesa. M-Pesa is a registered trademark of Safaricom PLC.</p>
+    <h2>7. Intellectual Property</h2>
+    <p>All content, design, and code within Expender are the property of its developers. Nothing in these Terms grants you rights to our trademarks or intellectual property.</p>
+    <h2>8. Limitation of Liability</h2>
+    <p>To the maximum extent permitted by law, Expender and its developers shall not be liable for any indirect, incidental, or consequential damages, including incorrect transaction parsing or data loss.</p>
+    <h2>9. Termination</h2>
+    <p>You may stop using Expender at any time by uninstalling it.</p>
+    <h2>10. Governing Law</h2>
+    <p>These Terms are governed by the laws of the Republic of Kenya.</p>
+    <h2>11. Changes</h2>
+    <p>We may update these Terms. Continued use constitutes acceptance of the revised Terms.</p>
+    <h2>12. Contact</h2>
+    <p>Questions: <strong>legal@expender.app</strong></p>
+  </div>
+</section>
+
+
+<!-- EMAIL CONFIRMED (hidden) -->
+<section class="page" id="page-confirm">
+  <div class="confirm-page">
+    <div class="confirm-card">
+      <div class="confirm-tick">
+        <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h1>Email Confirmed</h1>
+      <p>Your address has been verified. Head back to Expender and log in to start tracking your M-Pesa spending.</p>
+      <button class="btn-primary" onclick="alert('io.supabase.flutter')">
+        Open Expender &amp; Log In
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+  </div>
+</section>
+
+
+<script>
+  function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-tabs a').forEach(a => a.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    const tab = document.getElementById('tab-' + name);
+    if (tab) tab.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+  
+  document.querySelectorAll('a[href="#"]').forEach(a =>
+    a.addEventListener('click', e => e.preventDefault())
+  );
+  
+  // 🔥 THIS IS THE NEW CODE - Auto-show confirm page when coming from email
+  if (window.location.hash === '#confirm' || window.location.search.includes('confirmed=true')) {
+    showPage('confirm');
+  }
+</script>
+</body>
+</html>
