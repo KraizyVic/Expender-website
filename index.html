@@ -450,12 +450,11 @@ function handleRouting() {
             if (typeof setupAppButton === 'function') {
                 setupAppButton();
             }
-            if (document.getElementById('page-confirm') && 
-                document.getElementById('page-confirm').classList.contains('active')) {
-                if (typeof openExpenderApp === 'function') {
-                    openExpenderApp();
-                }
-            }
+            //if (document.getElementById('page-confirm') && document.getElementById('page-confirm').classList.contains('active')) {
+            //  if (typeof openExpenderApp === 'function') {
+            //     openExpenderApp();
+            //   }
+            //}
         }, 500);
     }
     else if (hash === 'privacy') {
