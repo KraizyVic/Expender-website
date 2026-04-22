@@ -431,29 +431,50 @@
     const tab = document.getElementById('tab-' + name);
     if (tab) tab.classList.add('active');
     window.scrollTo({ top: 0, behavior: 'instant' });
+}
+
+document.querySelectorAll('a[href="#"]').forEach(a =>
+    a.addEventListener('click', e => e.preventDefault())
+);
+
+// Handle URL hash routing for all pages
+function handleRouting() {
+    const hash = window.location.hash.substring(1); // Remove the # symbol
+    
+    // Check which page to show
+    if (hash === 'confirm' || window.location.search.includes('confirmed=true')) {
+        showPage('confirm');
+        
+        // Auto-trigger app opening after 1 second on confirm page
+        setTimeout(() => {
+            if (typeof setupAppButton === 'function') {
+                setupAppButton();
+            }
+            if (document.getElementById('page-confirm') && 
+                document.getElementById('page-confirm').classList.contains('active')) {
+                if (typeof openExpenderApp === 'function') {
+                    openExpenderApp();
+                }
+            }
+        }, 500);
+    }
+    else if (hash === 'privacy') {
+        showPage('privacy');
+    }
+    else if (hash === 'terms') {
+        showPage('terms');
+    }
+    else {
+        // Default to home page for empty hash or unknown pages
+        showPage('home');
+    }
   }
   
-  document.querySelectorAll('a[href="#"]').forEach(a =>
-      a.addEventListener('click', e => e.preventDefault())
-  );
+  // Call routing on page load
+  handleRouting();
   
-  // Handle URL hash routing (scalable version)
-  const validPages = ['home', 'confirm', 'privacy', 'terms'];
-  const hash = window.location.hash.substring(1) || 'home'; // Default to home
-  
-  if (validPages.includes(hash)) {
-      showPage(hash);
-      
-      // Special handling for confirm page
-      if (hash === 'confirm' || window.location.search.includes('confirmed=true')) {
-          setTimeout(() => {
-              setupAppButton();
-              if (document.getElementById('page-confirm').classList.contains('active')) {
-                  openExpenderApp();
-              }
-          }, 500);
-      }
-  }
+  // Also handle when user clicks back/forward buttons (hash changes)
+window.addEventListener('hashchange', handleRouting);
   
   // ========== APP LAUNCH CONFIGURATION ==========
   const APP_CONFIG = {
