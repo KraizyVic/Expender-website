@@ -415,10 +415,10 @@
       </div>
       <h1>Email Confirmed</h1>
       <p>Your address has been verified. Head back to Expender and log in to start tracking your M-Pesa spending.</p>
-      <button class="btn-primary" id="openAppBtn">
+      <a href="https://kraizyvic.github.io/confirm-email" class="btn-primary">
         Open Expender &amp; Log In
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-      </button>
+      </a>
     </div>
   </div>
 </section>
@@ -473,79 +473,8 @@ function handleRouting() {
   handleRouting();
   
   // Also handle when user clicks back/forward buttons (hash changes)
-window.addEventListener('hashchange', handleRouting);
-  
-  // ========== APP LAUNCH CONFIGURATION ==========
-  const APP_CONFIG = {
-    // Your Supabase OAuth scheme (already configured in your AndroidManifest.xml)
-    customScheme: 'io.supabase.flutter://',
-    
-    // IMPORTANT: Replace with your actual Android package name
-    packageName: 'com.exralabs.expender',  // 🔥 CHANGE THIS
-    
-    // Fallback URLs
-    playStoreUrl: 'https://play.google.com/store/apps/details?id=com.yourcompany.expender',  // 🔥 CHANGE THIS
-    appStoreUrl: 'https://apps.apple.com/app/YOUR_APP_ID',  // 🔥 CHANGE THIS if you have iOS app
-    websiteUrl: 'https://kraizyvic.github.io/Expender-website/',  // 🔥 CHANGE THIS
-  };
+  window.addEventListener('hashchange', handleRouting);
 
-  // Function to open the app
-  function openExpenderApp() {
-    const startTime = Date.now();
-    
-    // Android devices
-    if (navigator.userAgent.match(/Android/i)) {
-      // Extract scheme without ://
-      const scheme = APP_CONFIG.customScheme.replace('://', '');
-      
-      // Build Intent URL
-      const intentUrl = `intent://open/#Intent;scheme=${scheme};package=${APP_CONFIG.packageName};S.browser_fallback_url=${encodeURIComponent(APP_CONFIG.playStoreUrl)};end;`;
-      
-      window.location.href = intentUrl;
-      
-      // Fallback: if app not installed, go to Play Store after 2 seconds
-      setTimeout(() => {
-        if (Date.now() - startTime < 2500) {
-          window.location.href = APP_CONFIG.playStoreUrl;
-        }
-      }, 2000);
-      return;
-    }
-    
-    // iOS devices
-    if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
-      window.location.href = APP_CONFIG.customScheme;
-      
-      setTimeout(() => {
-        if (Date.now() - startTime < 2500) {
-          window.location.href = APP_CONFIG.appStoreUrl;
-        }
-      }, 2000);
-      return;
-    }
-    
-    // Desktop or other - just open website
-    window.location.href = APP_CONFIG.websiteUrl;
-  }
-  
-  // Attach click handler to the button (will work even if button is created dynamically)
-  function setupAppButton() {
-    const openBtn = document.getElementById('openAppBtn');
-    if (openBtn) {
-      // Remove any existing listeners to avoid duplicates
-      const newBtn = openBtn.cloneNode(true);
-      openBtn.parentNode.replaceChild(newBtn, openBtn);
-      
-      newBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        openExpenderApp();
-      });
-    }
-  }
-  
-  // Initialize button when DOM is ready
-  document.addEventListener('DOMContentLoaded', setupAppButton);
-  
   // Also watch for page changes to re-setup button (in case confirm page loads later)
   const originalShowPage = showPage;
   window.showPage = function(name) {
