@@ -212,11 +212,11 @@
 <body>
 
 <nav>
-  <a class="nav-logo" href="#" onclick="showPage('home');return false;">Exp<span>ender</span></a>
+  <a class="nav-logo" href="/">Exp<span>ender</span></a>
   <ul class="nav-tabs">
-    <li><a href="#" onclick="showPage('home');return false;"    id="tab-home"    class="active">Home</a></li>
-    <li><a href="#" onclick="showPage('privacy');return false;" id="tab-privacy">Privacy</a></li>
-    <li><a href="#" onclick="showPage('terms');return false;"   id="tab-terms">Terms</a></li>
+    <li><a href="/" id="tab-home" class="active">Home</a></li>
+    <li><a href="/privacy" id="tab-privacy">Privacy</a></li>
+    <li><a href="/terms" id="tab-terms">Terms</a></li>
   </ul>
 </nav>
 
@@ -324,8 +324,8 @@
   <footer>
     <p>© 2025 Expender. Android only.</p>
     <div class="footer-links">
-      <a onclick="showPage('privacy')">Privacy Policy</a>
-      <a onclick="showPage('terms')">Terms of Use</a>
+      <a href="/privacy">Privacy Policy</a>
+      <a href="/terms">Terms of Use</a>
     </div>
   </footer>
 </section>
@@ -424,65 +424,105 @@
 </section>
 
 <script>
-  function showPage(name) {
+  // Path-based routing: map URL paths to page IDs
+  function route() {
+    const path = window.location.pathname;
+    
+    // Remove leading/trailing slashes and split
+    let cleanPath = path.replace(/^\/|\/$/g, '');
+    
+    // Default to home if root
+    if (cleanPath === '') {
+      cleanPath = 'home';
+    }
+    
+    // Map paths to page IDs
+    let pageId = null;
+    if (cleanPath === 'home' || cleanPath === 'index.html') {
+      pageId = 'home';
+    } else if (cleanPath === 'privacy') {
+      pageId = 'privacy';
+    } else if (cleanPath === 'terms') {
+      pageId = 'terms';
+    } else if (cleanPath === 'confirm' || window.location.search.includes('confirmed=true')) {
+      pageId = 'confirm';
+    } else {
+      // Unknown path - show 404-style home but preserve URL? We'll show home but keep path for demo
+      pageId = 'home';
+    }
+    
+    // Activate the page
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-tabs a').forEach(a => a.classList.remove('active'));
-    document.getElementById('page-' + name).classList.add('active');
-    const tab = document.getElementById('tab-' + name);
-    if (tab) tab.classList.add('active');
-    window.scrollTo({ top: 0, behavior: 'instant' });
-}
-
-document.querySelectorAll('a[href="#"]').forEach(a =>
-    a.addEventListener('click', e => e.preventDefault())
-);
-
-// Handle URL hash routing for all pages
-function handleRouting() {
-    const hash = window.location.hash.substring(1); // Remove the # symbol
     
-    // Check which page to show
-    if (hash === 'confirm' || window.location.search.includes('confirmed=true')) {
-        showPage('confirm');
-        
-        // Auto-trigger app opening after 1 second on confirm page
-        setTimeout(() => {
-            if (typeof setupAppButton === 'function') {
-                setupAppButton();
-            }
-            //if (document.getElementById('page-confirm') && document.getElementById('page-confirm').classList.contains('active')) {
-            //  if (typeof openExpenderApp === 'function') {
-            //     openExpenderApp();
-            //   }
-            //}
-        }, 500);
+    const activePage = document.getElementById('page-' + pageId);
+    if (activePage) activePage.classList.add('active');
+    
+    // Update nav active state
+    if (pageId === 'home') {
+      const homeTab = document.getElementById('tab-home');
+      if (homeTab) homeTab.classList.add('active');
+    } else if (pageId === 'privacy') {
+      const privacyTab = document.getElementById('tab-privacy');
+      if (privacyTab) privacyTab.classList.add('active');
+    } else if (pageId === 'terms') {
+      const termsTab = document.getElementById('tab-terms');
+      if (termsTab) termsTab.classList.add('active');
     }
-    else if (hash === 'privacy') {
-        showPage('privacy');
-    }
-    else if (hash === 'terms') {
-        showPage('terms');
-    }
-    else {
-        // Default to home page for empty hash or unknown pages
-        showPage('home');
+    
+    // Auto-open app for confirm page after delay
+    if (pageId === 'confirm') {
+      setTimeout(() => {
+        // optional app deep link logic would go here
+      }, 500);
     }
   }
   
-  // Call routing on page load
-  handleRouting();
-  
-  // Also handle when user clicks back/forward buttons (hash changes)
-  window.addEventListener('hashchange', handleRouting);
-
-  // Also watch for page changes to re-setup button (in case confirm page loads later)
-  const originalShowPage = showPage;
-  window.showPage = function(name) {
-    originalShowPage(name);
-    if (name === 'confirm') {
-      setTimeout(setupAppButton, 100);
+  // Intercept all internal link clicks to use pushState for SPA-like feel
+  function handleLinkClick(e) {
+    const link = e.target.closest('a');
+    if (!link) return;
+    
+    const href = link.getAttribute('href');
+    if (!href) return;
+    
+    // Only handle internal navigation (same origin, no external domains, not a download button, not a telegram link)
+    if (href.startsWith('http') && !href.startsWith(window.location.origin)) {
+      return; // Let external links behave normally
     }
-  };
+    
+    // Special cases: keep telegram and external app links as normal
+    if (href.includes('t.me') || href.includes('kraizyvic.github.io/confirm-email')) {
+      return;
+    }
+    
+    // Prevent default for internal links we want to handle via pushState
+    if (href.startsWith('/') || href.startsWith(window.location.origin)) {
+      e.preventDefault();
+      
+      let newPath = href;
+      if (href.startsWith(window.location.origin)) {
+        newPath = href.substring(window.location.origin.length);
+      }
+      
+      // Push new state and update route
+      window.history.pushState({}, '', newPath);
+      route();
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  }
+  
+  // Handle browser back/forward
+  window.addEventListener('popstate', () => {
+    route();
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  });
+  
+  // Attach click listener to document for link handling
+  document.addEventListener('click', handleLinkClick);
+  
+  // Initialize routing on page load
+  route();
 </script>
 </body>
 </html>
