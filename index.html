@@ -420,6 +420,28 @@
   </div>
 </section>
 
+<!-- Delete data page (hidden) -->
+<section class="page" id="page-delete">
+  <div class="delete-account-page">
+    <div class="legal-wrap">
+      <div class="legal-badge">Account</div>
+      <h1>Delete Your Account</h1>
+      <p class="legal-meta">Permanently remove your account and data</p>
+      <p>If you wish to delete your Expender account and all associated data, please follow these steps:</p>
+      <ol>
+        <li>Open the Expender app on your Android device.</li>
+        <li>Navigate to the Settings menu.</li>
+        <li>Tap on "Account Card with your name and email address".</li>
+        <li>Select the "Delete Account" option in <strong>RED</strong>.</li>
+        <li>Review the confirmation message and tap "Delete" to proceed.</li>
+        <li>Your account, including all transaction data and settings, will be permanently deleted.</li>
+      </ol>
+      <p><strong>Important:</strong> This action cannot be undone. All your data will be lost forever. If you have any subscriptions, they will be canceled automatically.</p>
+      <p>If you encounter any issues or need assistance, contact us at <strong>exralabs@gmail.com</strong>.</p>
+    </div>
+  </div>
+</section>
+
 <script>
   // Query-string routing: ?page=terms, ?page=privacy, ? or no param = home
   // Works on GitHub Pages and any static host — no server config needed.
@@ -430,13 +452,14 @@
     'privacy': 'privacy',
     'terms':   'terms',
     'confirm': 'confirm',
+    'delete':  'delete',
   };
 
   function getPageId() {
     const params = new URLSearchParams(window.location.search);
     // Support ?page=terms  AND  ?confirmed=true  legacy links
     if (params.get('confirmed') === 'true') return 'confirm';
-    const key = (params.get('page') || '').toLowerCase().trim();
+    const key = (params.get('page') || params.get("serverWindowId") ||'').toLowerCase().trim();
     return PAGE_MAP[key] || 'home';
   }
 
