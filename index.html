@@ -339,7 +339,7 @@
     <p class="legal-meta">Last updated: August 29, 2026</p>
     <p>Expender is committed to your privacy. This policy explains what data the app accesses, why, and how it is handled.</p>
     <h2>1. SMS Access</h2>
-    <p>Expender requests permission to read your SMS inbox solely to parse M-Pesa transaction messages. This data is processed <strong>locally on your device</strong> and is never transmitted to any server, third party, or cloud service.</p>
+    <p>Expender requests permission to read your SMS inbox solely to detect and parse bank and mobile money transaction messages (for example, bank alerts, card transaction notifications, and mobile money services such as M-Pesa). This data is processed <strong>locally on your device</strong> and is never transmitted to any server, third party, or cloud service.</p>
     <h2>2. Data We Collect</h2>
     <ul>
       <li><strong>Parsed transaction data</strong> — amounts, dates, recipient names, and transaction types extracted from M-Pesa messages.</li>
@@ -353,7 +353,8 @@
     <p>We do not sell, share, or transmit your data to any third party — including advertisers, analytics providers, or data brokers.</p>
     <h2>5. Permissions Used</h2>
     <ul>
-      <li><strong>READ_SMS</strong> — to scan M-Pesa messages. Required for core functionality.</li>
+      <li><strong>READ_SMS</strong> — to scan existing bank and payment SMS messages for transaction data. Required for core functionality.</li>
+      <li><strong>RECEIVE_SMS</strong> — to automatically detect new bank and payment SMS messages as they arrive, so transactions can be logged in real time. Required for core functionality.</li>
       <li><strong>NOTIFICATIONS</strong> — to send reminders and budget alerts.</li>
     </ul>
     <p>No other permissions are requested.</p>
